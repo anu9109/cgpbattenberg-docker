@@ -7,14 +7,12 @@
 # Description:      Battenberg algorithm and associated implementation script which detects subclonality and copy number in matched NGS data.
 # Website:          https://github.com/cancerit/cgpBattenberg
 # Base Image:       ubuntu
-# Build Cmd:        docker build biodckrdev/samtools 1.2/. ##########
 # Pull Cmd:         docker pull anu9109/cgpbattenberg
-# Run Cmd:          docker run anu9109/cgpbattenberg battenberg.pl ###########
+# Run Cmd:          docker run anu9109/cgpbattenberg battenberg.pl -h
 #################################################################
 
 # Set the base image to Ubuntu
 FROM ubuntu
-
 
 ################## BEGIN INSTALLATION ###########################
 
@@ -55,14 +53,6 @@ RUN cpanm Data::UUID \
   YAML \
   Template
 
-#RUN cpanm --force GD
-
-#RUN perl -MCPAN -e 'install Data::UUID' && \
-#  perl -MCPAN -e 'install IPC::System::Simple' && \
-#  perl -MCPAN -e 'install XML::Parser' && \
-#  perl -MCPAN -e 'install XML::Simple' && \
-#  cpan GD && \
-#  cpan YAML
 
 # Dependency: VCFtools
 RUN  cd home/ && \
@@ -82,16 +72,6 @@ RUN  cd home/ && \
   make install && \
   rm /home/samtools-1.3.tar.bz2
 
-# Dependency: libgd
-RUN cd home/ && \
-  wget https://github.com/libgd/libgd/releases/download/gd-2.1.1/libgd-2.1.1.tar.bz2 && \
-  tar -xvjf /home/libgd-2.1.1.tar.bz2 && \
-  cd /home/libgd-2.1.1 && \
-  ./configure --prefix=/usr/local && \
-  make && \
-  make install && \
-  rm /home/libgd-2.1.1.tar.bz2
-
 # Dependency: cgpVCF
 RUN cd home/ && \
   git clone https://github.com/cancerit/cgpVcf.git && \
@@ -107,17 +87,13 @@ RUN cd home/ && \
   cd /home/alleleCount && \
   ./setup.sh /opt/
 
- # Dependency: PCAP-core
- #RUN cd home/ && \
- # git clone https://github.com/ICGC-TCGA-PanCancer/PCAP-core.git && \
- # cd /home/PCAP-core && \
- # ./setup.sh /opt/
-
+ # Dependency: PCAP-core [Note: Does NOT install with the latest release (2.1.3), use working version 2.1.0 instead]
 RUN cd home/ && \
   wget https://github.com/ICGC-TCGA-PanCancer/PCAP-core/archive/v2.1.0.tar.gz && \ 
   tar -xvzf v2.1.0.tar.gz && \
   cd /home/PCAP-core-2.1.0 && \
-  ./setup.sh /opt/
+  ./setup.sh /opt/ && \
+  rm /home/v2.1.0.tar.gz
 
 
 ENV PERL5LIB=$PERL5LIB:/home/PCAP-core/lib
@@ -131,11 +107,6 @@ RUN cd home/ && \
 
 ENV PERL5LIB=$PERL5LIB:/home/cgpBattenberg/perl/bin
 
-# CHANGE WORKDIR to cgpBattenberg/perl/bin
-WORKDIR /home/cgpBattenberg/perl/bin
-
-# Use baseimage-docker's bash.
-CMD ["/bin/bash"]
 
 ##################### INSTALLATION END ##########################
 
