@@ -98,7 +98,7 @@ RUN cd home/ && \
 
 ENV PERL5LIB=$PERL5LIB:/home/PCAP-core/lib
 
-# cgpBattenberg
+# cgpBattenberg [Note: "make test" fails but "install" works; comment out testing]
 RUN cd home/ && \
  git clone https://github.com/cancerit/cgpBattenberg.git && \
  cd /home/cgpBattenberg && \
